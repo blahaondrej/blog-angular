@@ -1,7 +1,19 @@
 const express = require("express");
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const Post=  require('./models/post');
+
+// heslo Q8ons8eN5hTLAp3T, login: blahaondra
 
 const app = express();
+
+mongoose.connect('mongodb+srv://blahaondra:Q8ons8eN5hTLAp3T@cluster0.kuklgfi.mongodb.net/node-angular?retryWrites=true&w=majority')
+    .then(() => {
+        console.log('Connected to database!');
+    })
+    .catch(() => {
+        console.log('Connection failed!')
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -14,22 +26,42 @@ app.use((req, res, next) => {
 });
 
 app.post("/api/posts", (req, res, next) => {
-    const post = req.body;
-    console.log(post);
-    res.status(201).json({
-        message: "Post added successfully"
-    });
+    const post = new Post({
+        title: req.body.title,
+        content: req.body.content
+    }); // empty object
+    post.save().then(result => {
+        console.log(result);
+        res.status(201).json({
+            message: 'Post added successfully',
+            postId: result._id
+        });
+    })   // save to database);
 });
 
 app.get('/api/posts', (req, res, next) => {
-    const posts = [
-        { id: '154154', title: 'First server-side post', content: 'This is first content'},
-        { id: '154154', title: 'Second server-side post', content: 'This is second content'}
-    ];
-    res.json({
-        message: 'Posts fetched properly',
-        posts: posts
-    })
+    Post.find().then(documents => {
+        console.log(documents);
+        res.status(200).json({
+            message: 'Posts fetched properly',
+            posts: documents
+        });
+    });
+});
+
+app.delete("/api/posts/:id", (req, res, next) => {
+    Post.deleteOne({ _id: req.params.id })
+        .then(result => {
+            if (result.deletedCount === 0) {
+                return res.status(404).json({ message: "Post not found!" });
+            }
+            console.log(result);
+            res.status(200).json({ message: "Post deleted!" });
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({ message: "An error occurred while deleting the post." });
+        });
 });
 
 module.exports = app
