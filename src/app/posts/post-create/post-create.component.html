@@ -2,7 +2,7 @@
     <form (submit)="onAddPost(postForm)" #postForm="ngForm">
         <mat-form-field>
             <mat-label mat-label>Post Title</mat-label>
-            <input matInput type="text" ngModel name="title" required #title="ngModel">
+            <input matInput type="text" [ngModel]="post?.title" name="title" required #title="ngModel">
             @if (title.invalid) {
             <mat-error>Please enter a post title.</mat-error>
             }
@@ -10,7 +10,7 @@
         <mat-card-content>
             <mat-form-field>
                 <mat-label mat-label>Textarea</mat-label>
-                <textarea matInput ngModel name="content" required #content="ngModel"></textarea>
+                <textarea matInput [ngModel]="post?.content" name="content" required #content="ngModel"></textarea>
                 @if (content.invalid) {
                 <mat-error>Please enter a post content.</mat-error>
                 }

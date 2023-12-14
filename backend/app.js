@@ -39,6 +39,21 @@ app.post("/api/posts", (req, res, next) => {
     })   // save to database);
 });
 
+app.put("/api/posts/:id", (req, res, next) => {
+    Post.updateOne({ _id: req.params.id }, { title: req.body.title, content: req.body.content })
+        .then(result => {
+            if (result.nModified === 0) {
+                return res.status(404).json({ message: "Post not found!" });
+            }
+            console.log(result);
+            res.status(200).json({ message: "Update successful!" });
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({ message: "An error occurred while updating the post." });
+        });
+});
+
 app.get('/api/posts', (req, res, next) => {
     Post.find().then(documents => {
         console.log(documents);
